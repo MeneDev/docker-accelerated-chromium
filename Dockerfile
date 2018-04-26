@@ -16,6 +16,7 @@ RUN apt-key add /tmp/linux_signing_key.pub \
 	supervisor \
 	x11vnc \
 	fluxbox \
+	v4l-utils \
 	&& apt-get clean \
 	&& rm -rf /var/cache/* /var/log/apt/* /var/lib/apt/lists/* /tmp/* \
 	&& useradd -m -G chrome-remote-desktop,pulse-access chrome \
@@ -33,6 +34,24 @@ RUN apt-key add /tmp/linux_signing_key.pub \
 	' >> /home/chrome/.fluxbox/init \
 	&& chown -R chrome:chrome /home/chrome/.config /home/chrome/.fluxbox
 
+RUN apt-get update -y
+RUN apt-get install \
+      curl \
+      wget \
+      supervisor \
+      software-properties-common \
+      -y
+
+RUN add-apt-repository ppa:saiarcot895/chromium-beta
+
+RUN apt-get update
+
+RUN apt-get install -y chromium-browser
+
+RUN apt-get install -y libva-glx1 libva-x11-1 i965-va-driver
+RUN adduser chrome video
+# TODO missmatch of group ids (fedora video = ubuntu irc, gid of device is important)
+RUN adduser chrome irc
 VOLUME ["/home/chrome"]
 
 EXPOSE 5900
